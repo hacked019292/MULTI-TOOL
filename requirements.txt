@@ -1,0 +1,4 @@
+# TraxerTool funciona solo con la librería estándar de Python 3.8+.
+# No se requieren dependencias externas para el funcionamiento base.
+# Este archivo se deja preparado por si en el futuro se agregan
+# integraciones opcionales (por ejemplo, 'requests' o 'rich').
