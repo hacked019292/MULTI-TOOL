@@ -20,8 +20,8 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from modules.ui import print_banner, ask, pause, error, info, ok, warn, c
-from modules import network, crypto_tools, osint
+from coremods.ui import print_banner, ask, pause, error, info, ok, warn, c
+from coremods import network, crypto_tools, osint, vuln_scan
 
 
 def menu_red():
@@ -143,6 +143,37 @@ def menu_cripto():
         pause()
 
 
+def menu_vulnerabilidades():
+    while True:
+        print(c("\n── DETECCIÓN DE VULNERABILIDADES (PASIVA) ──", "bold"))
+        print(" 1) Banner grabbing (identificar versión de un servicio)")
+        print(" 2) Buscar CVEs conocidos por software/versión")
+        print(" 3) Revisar archivos/rutas sensibles expuestas")
+        print(" 4) Reporte completo (banners + rutas sensibles)")
+        print(" 0) Volver")
+        op = ask("Elige una opción")
+
+        if op == "1":
+            host = ask("Host o IP")
+            puertos_raw = ask("Puertos separados por coma [80,443,21,22,25]") or "80,443,21,22,25"
+            ports = parse_ports(puertos_raw) or [80, 443, 21, 22, 25]
+            vuln_scan.banner_scan(host, ports)
+        elif op == "2":
+            kw = ask("Software y versión (ej. 'OpenSSH 7.2' o 'Apache 2.4.49')")
+            vuln_scan.buscar_cves(kw)
+        elif op == "3":
+            url = ask("URL o dominio (ej. ejemplo.com)")
+            vuln_scan.check_exposed_paths(url)
+        elif op == "4":
+            host = ask("Host o dominio objetivo")
+            vuln_scan.full_vuln_report(host)
+        elif op == "0":
+            return
+        else:
+            error("Opción inválida")
+        pause()
+
+
 def menu_osint():
     while True:
         print(c("\n── OSINT (RECON PASIVO) ──", "bold"))
@@ -175,7 +206,8 @@ def menu_principal():
         print("  1) 🌐 Red y Reconocimiento")
         print("  2) 🔐 Criptografía y Contraseñas")
         print("  3) 🕵️  OSINT (reconocimiento pasivo)")
-        print("  4) ℹ️  Acerca de / Aviso legal")
+        print("  4) 🩹 Detección de vulnerabilidades (pasiva)")
+        print("  5) ℹ️  Acerca de / Aviso legal")
         print("  0) 🚪 Salir")
         op = ask("Elige una opción")
 
@@ -186,6 +218,8 @@ def menu_principal():
         elif op == "3":
             menu_osint()
         elif op == "4":
+            menu_vulnerabilidades()
+        elif op == "5":
             mostrar_acerca_de()
             pause()
         elif op == "0":
@@ -211,3 +245,4 @@ if __name__ == "__main__":
         print()
         info("Saliendo... ¡Hasta la próxima!")
         sys.exit(0)
+            
